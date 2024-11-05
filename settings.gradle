@@ -1,0 +1,4 @@
+rootProject.name = 'forrrest'
+include 'forrrest-common'
+include 'forrrest-authservice'
+include 'forrrest-userservice'
