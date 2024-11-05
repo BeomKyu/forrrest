@@ -1,0 +1,9 @@
+[submodule "forrrest-common"]
+	path = forrrest-common
+	url = https://github.com/BeomKyu/forrrest-common.git
+[submodule "forrrest-authservice"]
+	path = forrrest-authservice
+	url = https://github.com/BeomKyu/forrrest-authservice.git
+[submodule "forrrest-userservice"]
+	path = forrrest-userservice
+	url = https://github.com/BeomKyu/forrrest-userservice.git
