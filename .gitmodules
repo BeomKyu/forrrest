@@ -7,3 +7,6 @@
 [submodule "forrrest-userservice"]
 	path = forrrest-userservice
 	url = https://github.com/BeomKyu/forrrest-userservice.git
+[submodule "forrrest-appmanagementservice"]
+	path = forrrest-appmanagementservice
+	url = https://github.com/BeomKyu/forrrest-appmanagementservice.git
