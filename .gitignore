@@ -44,6 +44,9 @@ application-deploy.yml
 
 ### docker-compose ###
 docker-compose.yml
+docker-compose-dev.yml
+docker-compose-stag.yml
+docker-compose-deploy.yml
 
 ### cursorignore ###
 .cursorignore
