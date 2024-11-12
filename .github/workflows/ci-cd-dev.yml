@@ -50,8 +50,8 @@ jobs:
 
       - name: Build Docker Images
         run: |
-          docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/forrrest-auth:dev -f forrrest-authservice/Dockerfile-auth forrrest-authservice
-          docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/forrrest-app-management:dev -f forrrest-appmanagementservice/Dockerfile-app forrrest-appmanagementservice
+          docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/forrrest-auth:dev -f Dockerfile-auth forrrest-authservice
+          docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/forrrest-app-management:dev -f Dockerfile-app forrrest-appmanagementservice
 
       - name: Push Docker Images
         run: |
