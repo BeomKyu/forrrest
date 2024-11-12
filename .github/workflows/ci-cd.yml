@@ -1,0 +1,53 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI/CI Pipeline
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    tags:
+     - dev
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Images
+        run: |
+          docker build -t beomkyu97/forrrest-auth:dev -f Dockerfile-auth .
+          docker build -t beomkyu97/forrrest-app-management:dev -f Dockerfile-app .
+
+      - name: Push Docker Images
+        run: |
+          docker push beomkyu97/forrrest-auth:dev
+          docker push beomkyu97/forrrest-app-management:dev
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to Server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} "cd /forrrest/dev && docker-compose -f docker-compose-dev.yml down && docker-compose -f docker-compose-dev.yml pull && docker-compose -f docker-compose-dev.yml up -d"
