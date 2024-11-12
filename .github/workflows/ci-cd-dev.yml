@@ -75,5 +75,12 @@ jobs:
       - name: Deploy to Server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        # GitHub Actions 설정 파일에서 'deploy' 단계에 추가
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} "cd ~/forrrest/dev && docker-compose -f docker-compose-dev.yml down && docker-compose -f docker-compose-dev.yml pull && docker-compose -f docker-compose-dev.yml up -d"
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} "
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          cd ~/forrrest/dev && docker-compose -f docker-compose-dev.yml down
+          docker-compose -f docker-compose-dev.yml pull
+          docker-compose -f docker-compose-dev.yml up -d
+          "
+
