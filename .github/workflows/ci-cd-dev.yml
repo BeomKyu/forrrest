@@ -82,7 +82,7 @@ jobs:
           ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }} "
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin &&
           cd ~/forrrest/dev &&
-          docker-compose -f docker-compose-dev.yml down &&
+          docker-compose -f docker-compose-dev.yml down --rmi all &&
           docker-compose -f docker-compose-dev.yml pull &&
           docker-compose -f docker-compose-dev.yml up -d
           "
