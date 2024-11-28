@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: forrrest-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: local_forrrest_db
+      MYSQL_USER: local_forrrest_user
+      MYSQL_PASSWORD: local_forrrest_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - forrrest-network
+
+volumes:
+  mysql_data:
+    name: forrrest-mysql-data
+
+networks:
+  forrrest-network:
+    name: forrrest-network

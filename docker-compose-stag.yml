@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: forrrest-mysql-stag
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: stag_forrrest_db
+      MYSQL_USER: stag_forrrest_user
+      MYSQL_PASSWORD: stag_forrrest_password
+    ports:
+      - "25710:3306"
+    volumes:
+      - mysql_stag_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - forrrest-network-stag
+
+  app-management:
+    image: forrrest-app-management:stag
+    container_name: forrrest-app-management-stag
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/stag_forrrest_db
+      SPRING_DATASOURCE_USERNAME: stag_forrrest_user
+      SPRING_DATASOURCE_PASSWORD: stag_forrrest_password
+      TOKEN_SECRET: ${TOKEN_SECRET}
+    ports:
+      - "25711:25711"
+    depends_on:
+      - mysql
+    networks:
+      - forrrest-network-stag
+
+  auth-service:
+    image: forrrest-auth:stag
+    container_name: forrrest-auth-stag
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/stag_forrrest_db
+      SPRING_DATASOURCE_USERNAME: stag_forrrest_user
+      SPRING_DATASOURCE_PASSWORD: stag_forrrest_password
+      TOKEN_SECRET: ${TOKEN_SECRET}
+    ports:
+      - "25712:25712"
+    depends_on:
+      - mysql
+    networks:
+      - forrrest-network-stag
+
+volumes:
+  mysql_stag_data:
+    name: forrrest-mysql-stag-data
+
+networks:
+  forrrest-network-stag:
+    name: forrrest-network-stag

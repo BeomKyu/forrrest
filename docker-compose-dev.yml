@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: forrrest-mysql-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dev_forrrest_db
+      MYSQL_USER: dev_forrrest_user
+      MYSQL_PASSWORD: dev_forrrest_password
+    ports:
+      - "17170:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - forrrest-network-dev
+
+  auth-service:
+    image: forrrest-auth:dev
+    container_name: forrrest-auth-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_forrrest_db
+      SPRING_DATASOURCE_USERNAME: dev_forrrest_user
+      SPRING_DATASOURCE_PASSWORD: dev_forrrest_password
+      TOKEN_SECRET: ${TOKEN_SECRET}
+    ports:
+      - "17171:17171"
+    depends_on:
+      - mysql
+    networks:
+      - forrrest-network-dev
+
+  app-management:
+    image: forrrest-app-management:dev
+    container_name: forrrest-app-management-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_forrrest_db
+      SPRING_DATASOURCE_USERNAME: dev_forrrest_user
+      SPRING_DATASOURCE_PASSWORD: dev_forrrest_password
+      TOKEN_SECRET: ${TOKEN_SECRET}
+    ports:
+      - "17172:17172"
+    depends_on:
+      - mysql
+    networks:
+      - forrrest-network-dev
+
+volumes:
+  mysql_dev_data:
+    name: forrrest-mysql-dev-data
+
+networks:
+  forrrest-network-dev:
+    name: forrrest-network-dev
