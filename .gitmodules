@@ -10,3 +10,6 @@
 [submodule "forrrest-appmanagementservice"]
 	path = forrrest-appmanagementservice
 	url = https://github.com/BeomKyu/forrrest-appmanagementservice.git
+[submodule "forrrest-apigateway"]
+	path = forrrest-apigateway
+	url = https://github.com/BeomKyu/forrrest-apigateway.git
