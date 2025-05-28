@@ -13,3 +13,9 @@
 [submodule "forrrest-apigateway"]
 	path = forrrest-apigateway
 	url = https://github.com/BeomKyu/forrrest-apigateway.git
+[submodule "forrrest-chatservice"]
+	path = forrrest-chatservice
+	url = https://github.com/BeomKyu/forrrest-chatservice.git
+[submodule "forrrest-friendservice"]
+	path = forrrest-friendservice
+	url = https://github.com/BeomKyu/forrrest-friendservice.git
