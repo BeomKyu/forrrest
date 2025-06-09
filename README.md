@@ -1,74 +1,73 @@
-# Forrrest 프로젝트 개요
-## 1. 아키텍처
-### 마이크로서비스 아키텍처 기반
-- 공통 모듈(common)과 인증 서비스(auth-service) 구조
+# Forrrest 프로젝트 요약 및 로드맵
 
-## 2. Common Module
-### 2.1 보안 컴포넌트
+## 1. 전체 아키텍처
 
-#### *Security Features*
-참조:
-- Token-based Authentication
-- JWT(JSON Web Token) 기반의 인증 시스템을 구현하며, 다음과 같은 토큰 타입을 지원합니다:
+* **마이크로서비스 구성**: AuthService, UserService, AppManagementService, Gateway, FriendService, ChatService, CalendarService, DriveService, MailService
+* **API Gateway**: Spring Cloud Gateway 기반 라우팅, JWT 인증 필터, 로깅·모니터링 PoC
+* **실시간 메시징**: WebSocket + Redis Pub/Sub를 통한 메시지 브로드캐스트
+* **데이터 저장소**: 서비스별 MySQL (메시지 저장용 테이블 포함)
+* **CI/CD 파이프라인**: 로컬 Docker Compose, 프로덕션 Kubernetes 배포, GitHub Actions 자동화
 
-```
-  public enum TokenType {
-    USER_ACCESS,    // 일반 사용자 접근 토큰
-    USER_REFRESH,   // 일반 사용자 갱신 토큰
-    PROFILE_ACCESS, // 프로필 접근 토큰
-    PROFILE_REFRESH,// 프로필 갱신 토큰
-    NONCE          // 일회성 토큰
+## 2. 현재 구현된 기능
 
-}
-```
-### 2.2 핵심 컴포넌트
-- TokenProvider: 토큰 생성 및 검증 인터페이스
-- TokenAuthentication: Spring Security Authentication 구현체
-- UserTokenAuthentication
-- ProfileTokenAuthentication
-- NonceTokenAuthentication
-- AbstractTokenFilter: 토큰 타입별 필터 구현
+* **common 모듈**: JWT 생성·검증, Spring Security 필터 통합
+* **auth-service**: 회원가입, 로그인, Access/Refresh 토큰 발급·갱신, 프로필 CRUD
+* **app-management-service**: 앱 등록 및 앱 관리, Nonce 토큰 발급·인증
+* **gateway**: 라우팅 PoC, JWT 인증 필터 적용
 
-## Auth Service
-### 3.1 주요 엔티티
-1. User: 사용자 정보 관리
-  - email (unique)
-  - password
-  - username
-2. profiles (OneToMany)
-  - Profile: 사용자 프로필 관리
-  - name
-  - isDefault
-  - user (ManyToOne)
-3. RefreshToken: 토큰 갱신 관리
-  - email (PK)
-  - refreshToken
-  - expiryDate
-### 3.2 인증 흐름
-1. 로그인/회원가입
-2. 사용자 인증 후 User Access/Refresh 토큰 발급
-3. 기본 프로필에 대한 Profile Access/Refresh 토큰 발급
-4. 프로필 전환
-5. 선택한 프로필에 대한 새로운 Profile 토큰 발급
-6. 기존 User 토큰 유지
-7. 토큰 갱신
-8. Refresh 토큰을 통한 Access 토큰 재발급
+## 3. 향후 구현 예정 기능
 
-## 4. 테스트 전략
-### 4.1 단위 테스트
-- Service Layer
-- AuthService: 로그인, 토큰 갱신 검증
-- ProfileService: 프로필 선택, 관리 검증
-### 4.2 보안 테스트
-- TokenFilter
-- 유효한/유효하지 않은 토큰 검증
-- 토큰 타입별 접근 제어 검증
-## 5. 예외 처리
-- CustomException을 통한 비즈니스 예외 처리
-- ErrorCode를 통한 일관된 에러 응답 관리
-- TokenExceptionHandler를 통한 보안 예외 처리
-## 6. API 보안
-- Bearer 토큰 기반 인증
-- 경로별 토큰 타입 검증
-- JWT를 통한 안전한 사용자/프로필 정보 전달
-- 이 구조를 통해 멀티 프로필을 지원하는 안전하고 확장 가능한 인증 시스템을 구현했습니다.
+### 3.1 MVP (최소 기능 제품)
+
+1. **gateway**: 라우팅 PoC, JWT 인증 필터 적용
+2. **API Gateway 강화**: CORS, Rate Limiting, TLS 지원
+3. **FriendService**: 친구 요청·수락·삭제, 목록 조회, 차단 기능
+4. **ChatService**: 실시간 채팅, 메시지 영속화, 읽음 처리
+5. **UserService**: 프로필 및 보안 관리, 활동 로그 기록
+
+### 3.2 추가 확장 기능
+
+* **CalendarService & DriveService**: 일정 관리, 파일 저장·조회
+* **MailService**: 이메일 송수신, 스팸 필터링
+* **로깅·모니터링**: ELK 스택, Prometheus 연동
+* **알림 서비스**: NotificationService 이벤트 발행
+* **소셜 로그인 & MFA**: Google/GitHub OAuth2, 2단계 인증(TOTP)
+* **Secret/Key Rotation & 블랙리스트 관리**: 주기적 키 교체, 토큰 무효화
+
+## 4. 프로젝트 개요
+
+Forrrest는 로그인, 채팅, 드라이브, 캘린더 등 자주 쓰이는 기능을 미리 구현해 둔 **백엔드 모듈 세트**입니다. 개발자는 각각의 기능을 직접 하나하나 개발할 필요 없이 필요한 서비스를 가져다 쓰기만 하면 되며, 공통 인증·인가 모듈과 독립 실행형 마이크로서비스 구조를 통해 손쉽게 확장하고 유지보수하는 것을 목표로 합니다.
+
+## 5. 목표
+
+* **장기 목표**: 단일 인증 체계로 모든 협업 도구 통합
+* **단기 목표 (MVP)**: 인증, 사용자·앱 관리, Gateway, 친구·채팅·일정·메일 핵심 기능 구현
+
+## 6. 핵심 기능 및 우선순위
+
+|  단계 | 기능                                         |  상태 |
+| :-: | ------------------------------------------ | :-: |
+| 1단계 | 인증·인가 및 프로필 CRUD                           |  완료 |
+| 2단계 | 앱 관리                         |  완료 |
+| 3단계 | Gateway PoC                         |  예정 |
+| 4단계 | FriendService, ChatService 구현 |  예정 |
+| 5단계 | ChatService 구현 |  예정 |
+
+## 7. 로드맵 & 일정
+
+|    주차   | 마일스톤                                |
+| :-----: | ----------------------------------- |
+|   1주차   | 공통 모듈 안정화, DB 스키마 확정                |
+|   2주차   | AuthService·UserService 기능 완성 및 테스트 |
+|   3주차   | AppManagementService 완성, Gateway 배포 |
+|   4주차   | FriendService 설계 및 Skeleton 개발      |
+|  5\~6주차 | ChatService Skeleton 개발 및 통합 테스트 및 배포       |
+
+## 8. 성공 지표 (KPI)
+
+* **인증 API 응답 시간 (P95)**: ≤ 200ms
+* **월간 활성 사용자(MAU) 목표**: 달성 여부
+* **빌드 성공률**: ≥ 95%
+* **채팅 지연 시간 (P95)**: ≤ 100ms
+* **친구·알림 활성화율**: ≥ 80%
+
